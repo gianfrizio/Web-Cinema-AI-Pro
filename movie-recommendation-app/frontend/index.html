@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Film Recommendation App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 CinemaAI Pro</h1>
+            <p>Raccomandazioni cinematografiche intelligenti powered by AI</p>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalMovies">0</span>
+                    <span class="stat-label">Film Analizzati</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="totalRecommendations">0</span>
+                    <span class="stat-label">Raccomandazioni</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="accuracyRate">98%</span>
+                    <span class="stat-label">Precisione AI</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Form per inserire film preferiti con validazione avanzata -->
+            <section class="input-section">
+                <h2>🎭 I tuoi film preferiti</h2>
+                <form id="movieForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="movieTitle">Titolo del film:</label>
+                            <input type="text" id="movieTitle" name="movieTitle" required 
+                                   placeholder="Inizia a digitare... (es. Inception, Avatar)" 
+                                   autocomplete="off"
+                                   aria-describedby="titleHelp">
+                            <small id="titleHelp" class="form-help">💡 Digita il titolo per suggerimenti automatici</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="movieGenre">Genere:</label>
+                            <select id="movieGenre" name="movieGenre" required aria-describedby="genreHelp">
+                                <option value="">Seleziona genere</option>
+                                <option value="action">🎬 Azione</option>
+                                <option value="comedy">😂 Commedia</option>
+                                <option value="drama">🎭 Drama</option>
+                                <option value="horror">👻 Horror</option>
+                                <option value="sci-fi">🚀 Fantascienza</option>
+                                <option value="romance">💕 Romantico</option>
+                                <option value="thriller">🔥 Thriller</option>
+                                <option value="adventure">🗺️ Avventura</option>
+                                <option value="fantasy">🧙‍♂️ Fantasy</option>
+                                <option value="animation">🎨 Animazione</option>
+                                <option value="documentary">📚 Documentario</option>
+                            </select>
+                                                        <small id="genreHelp" class="form-help">🎭 Si compila automaticamente se riconosciuto</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="movieRating">La tua valutazione (opzionale):</label>
+                            <div class="rating-container">
+                                <div class="star-rating" id="starRating">
+                                    <span class="star" data-rating="1">⭐</span>
+                                    <span class="star" data-rating="2">⭐</span>
+                                    <span class="star" data-rating="3">⭐</span>
+                                    <span class="star" data-rating="4">⭐</span>
+                                    <span class="star" data-rating="5">⭐</span>
+                                </div>
+                                <span class="rating-text" id="ratingText">Opzionale - Default 3 stelle</span>
+                            </div>
+                            <input type="hidden" id="movieRating" name="movieRating">
+                        </div>
+                        <div class="form-group">
+                            <label for="movieYear">Anno:</label>
+                            <input type="number" id="movieYear" name="movieYear" 
+                                   min="1900" max="2025" placeholder="2023">
+                            <small class="form-help">Opzionale</small>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <span class="btn-icon">➕</span>
+                        Aggiungi Film
+                    </button>
+                </form>
+            </section>
+
+            <!-- Lista film preferiti con filtri -->
+            <section class="favorite-movies">
+                <h2>📚 La tua collezione</h2>
+                <div class="collection-filters">
+                    <div class="filter-group">
+                        <label for="genreFilter">Filtra per genere:</label>
+                        <select id="genreFilter">
+                            <option value="">Tutti i generi</option>
+                            <option value="action">🎬 Azione</option>
+                            <option value="comedy">😂 Commedia</option>
+                            <option value="drama">🎭 Drama</option>
+                            <option value="horror">👻 Horror</option>
+                            <option value="sci-fi">🚀 Fantascienza</option>
+                            <option value="romance">💕 Romantico</option>
+                            <option value="thriller">🔥 Thriller</option>
+                            <option value="adventure">🗺️ Avventura</option>
+                            <option value="animation">🎨 Animazione</option>
+                            <option value="documentary">📚 Documentario</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sortBy">Ordina per:</label>
+                        <select id="sortBy">
+                            <option value="recent">Aggiunti di recente</option>
+                            <option value="rating">Valutazione</option>
+                            <option value="title">Titolo</option>
+                            <option value="year">Anno</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="movies-count">
+                    <span id="moviesCount">0 film nella collezione</span>
+                </div>
+                <ul id="favoriteMoviesList" class="movies-grid"></ul>
+                <div class="action-buttons">
+                    <button id="getRecommendations" class="btn-primary" disabled>
+                        <span class="btn-icon">🤖</span>
+                        Genera Raccomandazioni AI
+                    </button>
+                    <button id="clearAll" class="btn-secondary" disabled>
+                        <span class="btn-icon">🗑️</span>
+                        Svuota Collezione
+                    </button>
+                </div>
+            </section>
+
+            <!-- Sezione raccomandazioni avanzata -->
+            <section class="recommendations">
+                <h2>🎯 Raccomandazioni AI personalizzate</h2>
+                <div class="recommendations-controls">
+                    <div class="control-group">
+                        <label for="recommendationCount">Numero raccomandazioni:</label>
+                        <select id="recommendationCount">
+                            <option value="5">5 film</option>
+                            <option value="10" selected>10 film</option>
+                            <option value="15">15 film</option>
+                            <option value="20">20 film</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="similarityLevel">Livello similarità:</label>
+                        <select id="similarityLevel">
+                            <option value="high">Alta (molto simili)</option>
+                            <option value="medium" selected>Media (bilanciata)</option>
+                            <option value="low">Bassa (più varietà)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="recommendationsList" class="recommendations-grid"></div>
+                <div id="loadingSpinner" class="loading hidden">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <p class="loading-text">🤖 L'AI sta analizzando i tuoi gusti...</p>
+                    <div class="loading-steps">
+                        <div class="step active">Analisi preferenze</div>
+                        <div class="step">Ricerca similarità</div>
+                        <div class="step">Generazione raccomandazioni</div>
+                    </div>
+                </div>
+                <div id="noRecommendations" class="empty-state hidden">
+                    <div class="empty-icon">🎬</div>
+                    <h3>Aggiungi alcuni film per iniziare</h3>
+                    <p>Le raccomandazioni appariranno qui quando avrai aggiunto almeno 2 film alla tua collezione.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

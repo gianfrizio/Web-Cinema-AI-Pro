@@ -1,0 +1,41 @@
+# Python virtual environment
+microservice-python/venv/
+microservice-python/__pycache__/
+microservice-python/*.pyc
+
+# Java compiled files
+backend-java/target/
+backend-java/*.jar
+backend-java/*.war
+backend-java/*.ear
+
+# Node.js dependencies (if any)
+node_modules/
+npm-debug.log*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database files
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+*.temp
+
+# Package files
+*.tar.gz
+*.zip
+*.rar
