@@ -88,6 +88,21 @@ class MovieRecommendationApp {
             });
         }
 
+        // Filter and sort controls
+        const genreFilter = document.getElementById('genreFilter');
+        if (genreFilter) {
+            genreFilter.addEventListener('change', () => {
+                this.applyFilters();
+            });
+        }
+
+        const sortBy = document.getElementById('sortBy');
+        if (sortBy) {
+            sortBy.addEventListener('change', () => {
+                this.applyFilters();
+            });
+        }
+
         // Rating system event listeners
         document.querySelectorAll('.star').forEach(star => {
             star.addEventListener('click', (e) => {
@@ -379,12 +394,92 @@ class MovieRecommendationApp {
             return;
         }
 
-        // Sort movies by date added (newest first)
-        const sortedMovies = [...this.favoriteMovies].sort((a, b) => 
-            new Date(b.addedAt) - new Date(a.addedAt)
-        );
+        // Apply filters before displaying
+        this.applyFilters();
+    }
 
-        container.innerHTML = sortedMovies.map(movie => `
+    applyFilters() {
+        const container = document.getElementById('favoriteMoviesList');
+        if (!container) return;
+
+        // Get filter values
+        const genreFilter = document.getElementById('genreFilter');
+        const sortBy = document.getElementById('sortBy');
+        
+        const selectedGenre = genreFilter ? genreFilter.value : '';
+        const sortOption = sortBy ? sortBy.value : 'recent';
+
+        // Filter movies by genre
+        let filteredMovies = [...this.favoriteMovies];
+        if (selectedGenre) {
+            filteredMovies = filteredMovies.filter(movie => movie.genre === selectedGenre);
+        }
+
+        // Sort movies
+        switch (sortOption) {
+            case 'recent':
+                filteredMovies.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+                break;
+            case 'rating':
+                filteredMovies.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                break;
+            case 'title':
+                filteredMovies.sort((a, b) => a.title.localeCompare(b.title));
+                break;
+            case 'year':
+                filteredMovies.sort((a, b) => b.year - a.year);
+                break;
+        }
+
+        // Update display
+        this.renderMoviesList(filteredMovies);
+        
+        // Update counter
+        const moviesCountElement = document.getElementById('moviesCount');
+        if (moviesCountElement) {
+            const totalMovies = this.favoriteMovies.length;
+            const filteredCount = filteredMovies.length;
+            
+            if (selectedGenre) {
+                moviesCountElement.textContent = `${filteredCount} di ${totalMovies} film (filtrati per ${this.getGenreDisplayName(selectedGenre)})`;
+            } else {
+                moviesCountElement.textContent = `${totalMovies} film nella collezione`;
+            }
+        }
+    }
+
+    getGenreDisplayName(genreValue) {
+        const genreNames = {
+            'action': 'Azione',
+            'comedy': 'Commedia', 
+            'drama': 'Drama',
+            'horror': 'Horror',
+            'sci-fi': 'Fantascienza',
+            'romance': 'Romantico',
+            'thriller': 'Thriller',
+            'adventure': 'Avventura',
+            'animation': 'Animazione',
+            'documentary': 'Documentario',
+            'fantasy': 'Fantasy'
+        };
+        return genreNames[genreValue] || genreValue;
+    }
+
+    renderMoviesList(movies) {
+        const container = document.getElementById('favoriteMoviesList');
+        if (!container) return;
+
+        if (movies.length === 0) {
+            container.innerHTML = `
+                <div class="no-movies-filtered">
+                    <p>🔍 Nessun film trovato con i filtri selezionati.</p>
+                    <p>Prova a cambiare i criteri di filtro.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = movies.map(movie => `
             <li class="movie-card" data-movie-id="${movie.id}">
                 <div class="movie-header">
                     <h3>${movie.title}</h3>
@@ -394,7 +489,7 @@ class MovieRecommendationApp {
                 </div>
                 <div class="movie-details">
                     <span class="year-badge">${movie.year}</span>
-                    <span class="genre-tag">${movie.genre}</span>
+                    <span class="genre-tag">${this.getGenreDisplayName(movie.genre)}</span>
                     ${movie.rating > 0 ? `
                         <div class="movie-rating">
                             <span class="rating-label">Voto:</span>
